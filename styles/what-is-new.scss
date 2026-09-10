@@ -1,3 +1,9 @@
+// Fluid font sizes: shrink gracefully from desktop down to tablet width instead of
+// snapping at a single breakpoint.
+$font-fluid-title: clamp(20px, 17.18px + 0.75vw, 28px);
+$font-fluid-heading: clamp(16px, 14.59px + 0.38vw, 20px);
+$font-fluid-body: clamp(14px, 13.3px + 0.19vw, 16px);
+
 .what-is-new-page {
   @apply flex w-full flex-col items-center pt-[80px];
   background: white;
@@ -14,12 +20,6 @@
 .version-divider {
   @apply my-[60px] h-px w-full bg-primary-10;
 }
-
-// Fluid font sizes: shrink gracefully from desktop down to tablet width instead of
-// snapping at a single breakpoint.
-$font-fluid-title: clamp(20px, 17.18px + 0.75vw, 28px);
-$font-fluid-heading: clamp(16px, 14.59px + 0.38vw, 20px);
-$font-fluid-body: clamp(14px, 13.3px + 0.19vw, 16px);
 
 .version-panel {
   @apply flex items-start gap-[60px];
