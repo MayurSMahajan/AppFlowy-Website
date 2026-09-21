@@ -122,12 +122,12 @@ const nextConfig = {
         headers: securityHeaders,
       },
       {
-        // Cache Next.js static chunks with hashed filenames (immutable)
+        // Development chunk URLs are reused after edits; only production chunks are immutable.
         source: '/_next/static/:path*',
         headers: [
           {
             key: 'Cache-Control',
-            value: 'public, max-age=31536000, immutable',
+            value: isProd ? 'public, max-age=31536000, immutable' : 'no-store, must-revalidate',
           },
         ],
       },

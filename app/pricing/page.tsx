@@ -116,8 +116,8 @@ function generatePricingSchema(siteUrl: string) {
         {
           '@type': 'Offer',
           name: 'Self-hosted Plans',
-          description: 'Enterprise-grade self-hosted solutions starting from $1/month',
-          priceRange: '$1-Custom',
+          description: 'Self-hosted plans from Free to Enterprise',
+          priceRange: '$0-Contact us',
           priceCurrency: 'USD',
         },
       ],
