@@ -5,7 +5,7 @@ import Script from 'next/script';
 import React from 'react';
 import 'styles/vs-notion.scss';
 import { QASection } from '../components/qa-section';
-import SelfHostLink from '../components/self-host-link';
+import ImportLink from '../components/import-link';
 import { ComparisonTable } from '../components/comparison-table';
 import { HeroApps } from '../components/hero-apps';
 import { HeroFeaturePills } from '../components/hero-feature-pills';
@@ -383,6 +383,8 @@ const points = [
   },
 ];
 
+const importBaseURL: string = `${process.env.NEXT_PUBLIC_SITE_BASE_URL}/app`;
+
 function Page() {
   return (
     <>
@@ -405,7 +407,7 @@ function Page() {
                 items={['Open-core', 'Self-hosted', 'Local & on-prem AI', 'Cross-platform', 'Advanced relational databases']}
               />
             </div>
-            <SelfHostLink />
+            <ImportLink importBaseURL={importBaseURL} source='confluence' />
           </div>
         </div>
         <div className={'af-container'}>
