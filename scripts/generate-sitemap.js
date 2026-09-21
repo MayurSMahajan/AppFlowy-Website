@@ -12,6 +12,21 @@ const API_BASE_URL = process.env.SITEMAP_API_BASE_URL || 'https://beta.appflowy.
 const TEMPLATE_API = `${API_BASE_URL}/api/template-center`;
 
 /**
+ * Per-route crawl budget overrides for static routes.
+ *
+ * Keys are route paths without a leading slash, exactly as getStaticRoutes()
+ * builds them. Anything not listed here keeps the STATIC_ROUTE_DEFAULTS below.
+ * These pages are intentionally kept crawlable but low priority, so a re-run of
+ * this script must not promote them back to 1.0.
+ */
+const STATIC_ROUTE_OVERRIDES = {
+  'invitation/expired': { priority: '0.3' },
+  downloaded: { priority: '0.7' },
+};
+
+const STATIC_ROUTE_DEFAULTS = { priority: '1.0', changefreq: 'weekly' };
+
+/**
  * Static routes: every `page.tsx` under `app/`.
  *
  * Dynamic segments are skipped here and expanded from their real data sources
@@ -37,7 +52,7 @@ const getStaticRoutes = () => {
 
         if (pageRoute.includes('[')) return;
 
-        routes.push({ path: pageRoute, priority: '1.0', changefreq: 'weekly' });
+        routes.push({ path: pageRoute, ...STATIC_ROUTE_DEFAULTS, ...STATIC_ROUTE_OVERRIDES[pageRoute] });
       }
     });
   };
