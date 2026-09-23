@@ -47,16 +47,18 @@ const INPUT_TOP = 76.8;
 const INPUT_WIDTH = 37.35;
 const INPUT_HEIGHT = 16.2;
 
-// Timeline: the left content list wipes in top-to-bottom (a "linear" reveal
-// — pinned to the bottom edge, so the decoy recedes downward). The AI panel
-// then fades in as a whole window, then its user message, then its reply
-// and input field together — each cascading in a touch before the previous
-// one finishes.
-const LEFT_REVEAL_START = 0.4;
-const LEFT_REVEAL_DURATION = 0.9;
-const LEFT_REVEAL_END = LEFT_REVEAL_START + LEFT_REVEAL_DURATION;
+// Timeline: the left content list and the AI panel start on the same cue —
+// the list wipes in top-to-bottom (a "linear" reveal — pinned to the bottom
+// edge, so the decoy recedes downward) while the panel fades in as a whole
+// window beside it. The panel's own internals then cascade within it: user
+// message, then reply and input field together, each starting a touch before
+// the previous one finishes, all while the left list is still wiping.
+const REVEAL_START = 0.4;
 
-const WINDOW_REVEAL_START = LEFT_REVEAL_END - 0.2;
+const LEFT_REVEAL_START = REVEAL_START;
+const LEFT_REVEAL_DURATION = 0.9;
+
+const WINDOW_REVEAL_START = REVEAL_START;
 const WINDOW_REVEAL_DURATION = 0.4;
 const WINDOW_REVEAL_END = WINDOW_REVEAL_START + WINDOW_REVEAL_DURATION;
 
@@ -107,7 +109,8 @@ function WeeklyBriefIllu({ className }: IllustrationProps) {
           </div>
 
           {/* AI Briefing window decoy: covers the whole panel and fades out
-              first. The message/reply/input decoys below sit on top of it
+              on the same cue as the left list. The message/reply/input
+              decoys below sit on top of it
               (later in DOM) so they stay opaque and keep hiding their own
               regions even after the window decoy is gone. */}
           <motion.div

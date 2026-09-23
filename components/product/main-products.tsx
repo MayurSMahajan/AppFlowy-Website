@@ -76,7 +76,7 @@ function MainProducts() {
   const { start, stop } = useAutoPlay({
     options: illustrationOptions,
     onChange: setValue,
-    duration: 7500,
+    duration: 8000,
   });
 
   useEffect(() => {

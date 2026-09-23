@@ -36,30 +36,17 @@ const SUMMARY_TOP = 17.7;
 const SUMMARY_WIDTH = 35;
 const SUMMARY_HEIGHT = 65.7;
 
-// Timeline: graph header decoy fades away first, then the chart decoy wipes
-// left-to-right (pinned to the right edge, so it peels from the left). The
-// pie follows the same header-then-content shape, but its content decoy
-// shrinks as a circle from the center — fitting for a donut chart — instead
-// of a straight wipe. The summary decoy wipes top-to-bottom in parallel with
-// the pie's circular reveal (not after it) — the right column would
-// otherwise just sit empty while the pie animates on its own.
-const GRAPH_HEADER_REVEAL_START = 0.4;
-const GRAPH_HEADER_REVEAL_DURATION = 0.35;
-const GRAPH_HEADER_REVEAL_END = GRAPH_HEADER_REVEAL_START + GRAPH_HEADER_REVEAL_DURATION;
-
-const GRAPH_CHART_REVEAL_START = GRAPH_HEADER_REVEAL_END + 0.1;
-const GRAPH_CHART_REVEAL_DURATION = 0.9;
-const GRAPH_CHART_REVEAL_END = GRAPH_CHART_REVEAL_START + GRAPH_CHART_REVEAL_DURATION;
-
-const PIE_HEADER_REVEAL_START = GRAPH_CHART_REVEAL_END - 0.1;
-const PIE_HEADER_REVEAL_DURATION = 0.35;
-const PIE_HEADER_REVEAL_END = PIE_HEADER_REVEAL_START + PIE_HEADER_REVEAL_DURATION;
-
-const PIE_CHART_REVEAL_START = PIE_HEADER_REVEAL_END + 0.1;
-const PIE_CHART_REVEAL_DURATION = 0.8;
-
-const SUMMARY_REVEAL_START = PIE_CHART_REVEAL_START;
-const SUMMARY_REVEAL_DURATION = 0.9;
+// Timeline: all three blocks reveal at once — one shared start, one shared
+// one-second window, so the graph, the pie and the summary land together
+// instead of taking turns. Each keeps the reveal motion that suits it: the
+// graph's chart decoy wipes left-to-right (pinned to the right edge, so it
+// peels from the left), the pie's shrinks as a circle from the center —
+// fitting for a donut — and the summary's recedes downward. The two block
+// headers fade out on that same cue, just over a shorter beat, so the titles
+// are legible while the charts are still drawing in beneath them.
+const REVEAL_START = 0.4;
+const REVEAL_DURATION = 1;
+const HEADER_REVEAL_DURATION = 0.45;
 
 function ReleaseReviewIllu({ className }: IllustrationProps) {
   return (
@@ -79,7 +66,7 @@ function ReleaseReviewIllu({ className }: IllustrationProps) {
             className={'object-contain'}
           />
 
-          {/* Graph decoys: header fades out, then the chart decoy's width
+          {/* Graph decoys: header fades out while the chart decoy's width
               animates to 0 — pinned via `right`, so it peels left-to-right. */}
           <div
             className={'absolute'}
@@ -90,20 +77,20 @@ function ReleaseReviewIllu({ className }: IllustrationProps) {
               style={{ height: `${GRAPH_HEADER_HEIGHT}%` }}
               initial={{ opacity: 1 }}
               animate={{ opacity: 0 }}
-              transition={{ duration: GRAPH_HEADER_REVEAL_DURATION, delay: GRAPH_HEADER_REVEAL_START, ease: 'easeOut' }}
+              transition={{ duration: HEADER_REVEAL_DURATION, delay: REVEAL_START, ease: 'easeOut' }}
             />
             <motion.div
               className={'absolute right-0 bg-white'}
               style={{ top: `${GRAPH_HEADER_HEIGHT}%`, height: `${100 - GRAPH_HEADER_HEIGHT}%` }}
               initial={{ width: '100%' }}
               animate={{ width: '0%' }}
-              transition={{ duration: GRAPH_CHART_REVEAL_DURATION, delay: GRAPH_CHART_REVEAL_START, ease: 'easeInOut' }}
+              transition={{ duration: REVEAL_DURATION, delay: REVEAL_START, ease: 'easeInOut' }}
             />
           </div>
 
-          {/* Pie decoys: same header-fade shape, then the donut decoy
-              shrinks as a circle from the center — a "hole" opening outward
-              reads as circular the way a shrinking rectangle wouldn't. */}
+          {/* Pie decoys: same header fade, with the donut decoy shrinking as
+              a circle from the center — a "hole" opening outward reads as
+              circular the way a shrinking rectangle wouldn't. */}
           <div
             className={'absolute'}
             style={{ left: `${PIE_LEFT}%`, top: `${PIE_TOP}%`, width: `${PIE_WIDTH}%`, height: `${PIE_HEIGHT}%` }}
@@ -113,14 +100,14 @@ function ReleaseReviewIllu({ className }: IllustrationProps) {
               style={{ height: `${PIE_HEADER_HEIGHT}%` }}
               initial={{ opacity: 1 }}
               animate={{ opacity: 0 }}
-              transition={{ duration: PIE_HEADER_REVEAL_DURATION, delay: PIE_HEADER_REVEAL_START, ease: 'easeOut' }}
+              transition={{ duration: HEADER_REVEAL_DURATION, delay: REVEAL_START, ease: 'easeOut' }}
             />
             <motion.div
               className={'absolute inset-x-0 bg-white'}
               style={{ top: `${PIE_HEADER_HEIGHT}%`, height: `${100 - PIE_HEADER_HEIGHT}%` }}
               initial={{ clipPath: 'circle(100% at 50% 50%)' }}
               animate={{ clipPath: 'circle(0% at 50% 50%)' }}
-              transition={{ duration: PIE_CHART_REVEAL_DURATION, delay: PIE_CHART_REVEAL_START, ease: 'easeInOut' }}
+              transition={{ duration: REVEAL_DURATION, delay: REVEAL_START, ease: 'easeInOut' }}
             />
           </div>
 
@@ -134,7 +121,7 @@ function ReleaseReviewIllu({ className }: IllustrationProps) {
               className={'absolute inset-x-0 bottom-0 bg-white'}
               initial={{ height: '100%' }}
               animate={{ height: '0%' }}
-              transition={{ duration: SUMMARY_REVEAL_DURATION, delay: SUMMARY_REVEAL_START, ease: 'easeInOut' }}
+              transition={{ duration: REVEAL_DURATION, delay: REVEAL_START, ease: 'easeInOut' }}
             />
           </div>
         </motion.div>

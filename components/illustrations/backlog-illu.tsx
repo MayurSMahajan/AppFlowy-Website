@@ -5,7 +5,6 @@ import BacklogMenu1 from '@/assets/images/illustrations/backlog-menu-1.webp';
 import BacklogMenu2 from '@/assets/images/illustrations/backlog-menu-2.webp';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
-import Cursor from './cursor';
 import { IllustrationProps } from './types';
 
 // DecoyReveal: backlog-illu-base.webp already has the table fully drawn in
@@ -14,14 +13,6 @@ import { IllustrationProps } from './types';
 // reveal it — no second layer to export.
 
 const BASE_SLIDE_DURATION = 0.6;
-
-// Emily: a quick intro beat before there's anything to look at yet — fades
-// in and slides down, finishing just before the table starts growing in.
-const EMILY_COLOR = '#14B8A6';
-const EMILY_SPAWN = { left: 20, top: 50 };
-const EMILY_DEST = { left: 20, top: 100 };
-const EMILY_REVEAL_START = 0.25;
-const EMILY_APPEAR_DURATION = 1.5;
 
 // Table footprint, measured directly off backlog-illu-base.webp as a
 // percentage of its own 2560x1392 canvas — spans from the border above the
@@ -34,8 +25,8 @@ const TABLE_HEIGHT = 50;
 
 // Table decoy: height animates to 0, pinned via `bottom`, so it recedes
 // downward — uncovering the header and rows top-to-bottom, one after
-// another. Starts once Emily has landed, so the table appears to grow in
-// right after she arrives.
+// another. Kicks off just after the base image lands, so the table appears
+// to grow in as the frame settles.
 const TABLE_REVEAL_START = 0.1;
 const TABLE_REVEAL_DURATION = 1.5;
 const TABLE_REVEAL_END = TABLE_REVEAL_START + TABLE_REVEAL_DURATION;
@@ -73,7 +64,7 @@ function BacklogIllu({ className }: IllustrationProps) {
           />
 
           {/* Table decoy: nested inside the base's own wrapper for the same
-              zero-relative-motion reason as Emily and the menus below. */}
+              zero-relative-motion reason as the menus below. */}
           <div
             className={'absolute'}
             style={{ left: `${TABLE_LEFT}%`, top: `${TABLE_TOP}%`, width: `${TABLE_WIDTH}%`, height: `${TABLE_HEIGHT}%` }}
@@ -85,32 +76,6 @@ function BacklogIllu({ className }: IllustrationProps) {
               transition={{ duration: TABLE_REVEAL_DURATION, delay: TABLE_REVEAL_START, ease: 'easeInOut' }}
             />
           </div>
-
-          {/* Emily: nested inside the base wrapper for the same zero-
-              relative-motion reason as the table decoy above — fades in and
-              slides down to her landing spot before the table starts
-              growing in beneath her. */}
-          <motion.div
-            className={'absolute inset-0'}
-            initial={{
-              opacity: 0,
-              x: `${EMILY_SPAWN.left - EMILY_DEST.left}%`,
-              y: `${EMILY_SPAWN.top - EMILY_DEST.top}%`,
-            }}
-            animate={{ opacity: 1, x: '0%', y: '0%' }}
-            transition={{ duration: EMILY_APPEAR_DURATION, delay: EMILY_REVEAL_START, ease: 'easeIn' }}
-          >
-            <div
-              className={'absolute'}
-              style={{ left: `${EMILY_DEST.left}%`, top: `${EMILY_DEST.top}%` }}
-            >
-              <Cursor
-                label={'Emily'}
-                color={EMILY_COLOR}
-                direction={'left-top'}
-              />
-            </div>
-          </motion.div>
 
           {/* Menu cards: fade + slide up, staggered, once the table has
               finished growing in. Hidden properties (the back card) is

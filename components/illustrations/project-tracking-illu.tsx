@@ -27,74 +27,90 @@ const SMALL_CARD_SLOT = {
 };
 
 const BASE_SHADOW = 'drop-shadow(0 0px 0px rgba(15,23,42,0))';
-const LIFT_SHADOW = 'drop-shadow(0 32px 40px rgba(15,23,42,0.38))';
+const LIFT_SHADOW = 'drop-shadow(0 8px 12px rgba(15,23,42,0.16))';
 
-// Natasha spawns far up-left on the board and travels all the way to the
-// card, "picking it up" (triggers the card's reaction below) on arrival.
-const NATASHA = {
-  spawn: { left: 80, top: 80 },
-  dest: { left: 70, top: 60 },
-};
-
-// Mathieu spawns right next to the small card and sits still while Natasha's
-// story plays out, then makes the short hop onto the card once it's his turn.
+// Both cursors park on the bottom-right corner of the card they pick up, so
+// the pointer and its name pill hang off the card's edge instead of sitting
+// over the card's text.
 const MATHIEU = {
   spawn: { left: 25, top: 50 },
-  dest: { left: 37, top: 37 },
+  dest: { left: SMALL_CARD_SLOT.left + SMALL_CARD_SLOT.width - 1, top: SMALL_CARD_SLOT.top + SMALL_CARD_SLOT.height - 1 },
 };
 
-// "You" — a third, always-present collaborator. Arrives with the others,
-// lands near a card in the Completed column right as Natasha reaches the big
-// card, then wanders inward toward the board's center in a few small,
-// unevenly-timed hops — a bit of idle "still there, just looking around"
-// motion rather than a purposeful trip to any card.
-const YOU_COLOR = '#FB006D'; // AppFlowy's bright pink (fresh-red), also used in the logo mark
-const YOU = {
-  spawn: { left: 90, top: 18 },
-  dest: { left: 93, top: 33.5 }, // arrival point, timed to CARD_PICKUP_ARRIVE below
+const OLIVIA = {
+  spawn: { left: 86, top: 82 },
+  dest: { left: CARD_SLOT.left + CARD_SLOT.width - 1.5, top: CARD_SLOT.top + CARD_SLOT.height - 2 },
 };
-const YOU_WANDER = [
-  { left: 88, top: 37 },
-  { left: 85, top: 33 },
-  { left: 80, top: 40 },
-  { left: 77, top: 37 },
-];
-const YOU_WANDER_STEP_DURATIONS = [0.9, 0.7, 0.9, 0.7]; // uneven step lengths read as "random", not mechanical
 
-const CURSORS_APPEAR = 0.9; // also when Natasha sets off toward the big card
-const CARD_PICKUP_ARRIVE = 1.6; // when Natasha reaches the card
+const CURSORS_APPEAR = 0.6; // both cursors fade in at their spawn points
 
-// You starts wandering the instant Natasha reaches the big card, then hops
-// through YOU_WANDER at its uneven step durations. YOU_WANDER_TIMESTAMPS are
-// the absolute moments each hop lands; the last one is where it settles.
-const YOU_WANDER_TIMESTAMPS = YOU_WANDER_STEP_DURATIONS.reduce(
-  (timestamps, stepDuration) => [...timestamps, timestamps[timestamps.length - 1] + stepDuration],
-  [CARD_PICKUP_ARRIVE]
-).slice(1);
-const YOU_WANDER_END = YOU_WANDER_TIMESTAMPS[YOU_WANDER_TIMESTAMPS.length - 1];
+const TRAVEL_DURATION = 0.9; // trip from spawn to the card
+const HOVER_HOLD = 2; // how long a cursor rests on its card before heading back
+const RETURN_DURATION = 0.9; // trip back to the spawn point
+
+// Mathieu sets off first; Olivia follows a beat and a half later so the two
+// stories never read as simultaneous.
+const MATHIEU_TRAVEL_START = 0.9;
+const MATHIEU_ARRIVE = MATHIEU_TRAVEL_START + TRAVEL_DURATION;
+const MATHIEU_LEAVE_START = MATHIEU_ARRIVE + HOVER_HOLD;
+const MATHIEU_LEAVE_END = MATHIEU_LEAVE_START + RETURN_DURATION;
+
+const OLIVIA_STAGGER = 1.5; // Olivia starts this long after Mathieu starts
+const OLIVIA_TRAVEL_START = MATHIEU_TRAVEL_START + OLIVIA_STAGGER;
+const OLIVIA_ARRIVE = OLIVIA_TRAVEL_START + TRAVEL_DURATION;
+const OLIVIA_LEAVE_START = OLIVIA_ARRIVE + HOVER_HOLD;
+const OLIVIA_LEAVE_END = OLIVIA_LEAVE_START + RETURN_DURATION;
 
 const CARD_LIFT_DURATION = 0.5; // big card's pickup reaction, played on arrival
-const CARD_SETTLE_DURATION = 0.4; // big card's relax back to rest, played as Natasha leaves
-
-// Mathieu only sets off once Natasha has been hovering the big card for a
-// beat — keeps the two stories from reading as simultaneous. That's also the
-// cue for Natasha to leave and the big card to settle back down.
-const MATHIEU_TRAVEL_START = 2.5;
-const MATHIEU_TRAVEL_DURATION = 0.9;
-const MATHIEU_ARRIVE = MATHIEU_TRAVEL_START + MATHIEU_TRAVEL_DURATION;
-
-const NATASHA_LEAVE_START = MATHIEU_TRAVEL_START + 0.5; // leaves a beat after Mathieu sets off
-const NATASHA_LEAVE_DURATION = 0.9;
-const CARD_SETTLE_START = MATHIEU_TRAVEL_START;
+const CARD_SETTLE_DURATION = 0.4; // big card's relax back to rest, played as Olivia leaves
 
 const SMALL_CARD_LIFT_DURATION = 0.35; // small card's pickup reaction, played on arrival
-const SMALL_CARD_HOVER_DURATION = 3; // how long it stays lifted while "read"
 const SMALL_CARD_SETTLE_DURATION = 0.35; // relaxes back into place as Mathieu leaves
-const SMALL_CARD_SETTLE_START = MATHIEU_ARRIVE + SMALL_CARD_LIFT_DURATION + SMALL_CARD_HOVER_DURATION;
 
-const MATHIEU_LEAVE_START = SMALL_CARD_SETTLE_START; // steps away in sync with the card settling
-const MATHIEU_LEAVE_DURATION = 0.6;
-const MATHIEU_LEAVE_END = MATHIEU_LEAVE_START + MATHIEU_LEAVE_DURATION;
+// Turns a list of absolute timestamps into the delay/duration/times trio
+// framer-motion wants, so every beat below can be written as "when it
+// happens" rather than as a fraction of some enclosing tween.
+function keyframeTiming(timestamps: number[]) {
+  const start = timestamps[0];
+  const end = timestamps[timestamps.length - 1];
+  const duration = end - start;
+
+  return {
+    delay: start,
+    duration,
+    times: timestamps.map((timestamp) => (timestamp - start) / duration),
+  };
+}
+
+// Cursor keyframes: wait at spawn, travel, hold on the card, travel back.
+const MATHIEU_TIMING = keyframeTiming([
+  CURSORS_APPEAR,
+  MATHIEU_TRAVEL_START,
+  MATHIEU_ARRIVE,
+  MATHIEU_LEAVE_START,
+  MATHIEU_LEAVE_END,
+]);
+const OLIVIA_TIMING = keyframeTiming([
+  CURSORS_APPEAR,
+  OLIVIA_TRAVEL_START,
+  OLIVIA_ARRIVE,
+  OLIVIA_LEAVE_START,
+  OLIVIA_LEAVE_END,
+]);
+
+// Card keyframes: lift on arrival, hold lifted, settle as the cursor leaves.
+const CARD_TIMING = keyframeTiming([
+  OLIVIA_ARRIVE,
+  OLIVIA_ARRIVE + CARD_LIFT_DURATION,
+  OLIVIA_LEAVE_START,
+  OLIVIA_LEAVE_START + CARD_SETTLE_DURATION,
+]);
+const SMALL_CARD_TIMING = keyframeTiming([
+  MATHIEU_ARRIVE,
+  MATHIEU_ARRIVE + SMALL_CARD_LIFT_DURATION,
+  MATHIEU_LEAVE_START,
+  MATHIEU_LEAVE_START + SMALL_CARD_SETTLE_DURATION,
+]);
 
 function ProjectTrackingIllu({ className }: IllustrationProps) {
   return (
@@ -118,9 +134,9 @@ function ProjectTrackingIllu({ className }: IllustrationProps) {
               the same entrance slide with zero relative motion — it sits at
               rest in its slot from the very first frame (the base image
               already shows it there, so no separate fade of its own), then —
-              timed to Natasha's arrival — lifts with a rotate + scale +
-              deeper shadow, as if just picked up, holds through her hover,
-              then relaxes back to rest as she leaves and Mathieu sets off. */}
+              timed to Olivia's arrival — lifts with a small clockwise tilt +
+              scale + shadow, as if just picked up, holds through her hover,
+              then relaxes back to rest as she heads home. */}
           <motion.div
             className={'absolute'}
             style={{
@@ -132,21 +148,10 @@ function ProjectTrackingIllu({ className }: IllustrationProps) {
             initial={{ scale: 1, rotate: 0, filter: BASE_SHADOW }}
             animate={{
               scale: [1, 1.08, 1.08, 1],
-              rotate: [0, -5, -5, 0],
+              rotate: [0, 2, 2, 0],
               filter: [BASE_SHADOW, LIFT_SHADOW, LIFT_SHADOW, BASE_SHADOW],
             }}
-            transition={{
-              type: 'tween',
-              duration: CARD_SETTLE_START + CARD_SETTLE_DURATION - CARD_PICKUP_ARRIVE,
-              delay: CARD_PICKUP_ARRIVE,
-              times: [
-                0,
-                CARD_LIFT_DURATION / (CARD_SETTLE_START + CARD_SETTLE_DURATION - CARD_PICKUP_ARRIVE),
-                (CARD_SETTLE_START - CARD_PICKUP_ARRIVE) / (CARD_SETTLE_START + CARD_SETTLE_DURATION - CARD_PICKUP_ARRIVE),
-                1,
-              ],
-              ease: 'easeOut',
-            }}
+            transition={{ type: 'tween', ease: 'easeOut', ...CARD_TIMING }}
           >
             <Image
               src={BigCard}
@@ -173,19 +178,7 @@ function ProjectTrackingIllu({ className }: IllustrationProps) {
               rotate: [0, 2, 2, 0],
               filter: [BASE_SHADOW, LIFT_SHADOW, LIFT_SHADOW, BASE_SHADOW],
             }}
-            transition={{
-              type: 'tween',
-              duration: SMALL_CARD_SETTLE_START + SMALL_CARD_SETTLE_DURATION - MATHIEU_ARRIVE,
-              delay: MATHIEU_ARRIVE,
-              times: [
-                0,
-                SMALL_CARD_LIFT_DURATION / (SMALL_CARD_LIFT_DURATION + SMALL_CARD_HOVER_DURATION + SMALL_CARD_SETTLE_DURATION),
-                (SMALL_CARD_LIFT_DURATION + SMALL_CARD_HOVER_DURATION) /
-                (SMALL_CARD_LIFT_DURATION + SMALL_CARD_HOVER_DURATION + SMALL_CARD_SETTLE_DURATION),
-                1,
-              ],
-              ease: 'easeOut',
-            }}
+            transition={{ type: 'tween', ease: 'easeOut', ...SMALL_CARD_TIMING }}
           >
             <Image
               src={SmallCard}
@@ -199,86 +192,9 @@ function ProjectTrackingIllu({ className }: IllustrationProps) {
         {/* Outer wrapper is full-frame so a percentage transform on it is
             relative to the whole scene (not just the cursor's own size) —
             keeps the long cross-board travel responsive while staying
-            transform-only. Natasha retraces her steps back to her spawn
-            point (fading out as she goes) once Mathieu sets off, in sync
-            with the big card settling back down. */}
-        <motion.div
-          className={'absolute inset-0'}
-          initial={{
-            opacity: 0,
-            x: `${NATASHA.spawn.left - NATASHA.dest.left}%`,
-            y: `${NATASHA.spawn.top - NATASHA.dest.top}%`,
-          }}
-          animate={{
-            opacity: [0, 1, 1, 1],
-            x: [
-              `${NATASHA.spawn.left - NATASHA.dest.left}%`,
-              '0%',
-              '0%',
-              `${NATASHA.spawn.left - NATASHA.dest.left}%`,
-            ],
-            y: [
-              `${NATASHA.spawn.top - NATASHA.dest.top}%`,
-              '0%',
-              '0%',
-              `${NATASHA.spawn.top - NATASHA.dest.top}%`,
-            ],
-          }}
-          transition={{
-            opacity: {
-              type: 'tween',
-              delay: CURSORS_APPEAR,
-              duration: NATASHA_LEAVE_START + NATASHA_LEAVE_DURATION - CURSORS_APPEAR,
-              ease: 'easeOut',
-              times: [
-                0,
-                0.4 / (NATASHA_LEAVE_START + NATASHA_LEAVE_DURATION - CURSORS_APPEAR),
-                (NATASHA_LEAVE_START - CURSORS_APPEAR) / (NATASHA_LEAVE_START + NATASHA_LEAVE_DURATION - CURSORS_APPEAR),
-                1,
-              ],
-            },
-            x: {
-              type: 'tween',
-              delay: CURSORS_APPEAR,
-              duration: NATASHA_LEAVE_START + NATASHA_LEAVE_DURATION - CURSORS_APPEAR,
-              ease: 'easeInOut',
-              times: [
-                0,
-                (CARD_PICKUP_ARRIVE - CURSORS_APPEAR) / (NATASHA_LEAVE_START + NATASHA_LEAVE_DURATION - CURSORS_APPEAR),
-                (NATASHA_LEAVE_START - CURSORS_APPEAR) / (NATASHA_LEAVE_START + NATASHA_LEAVE_DURATION - CURSORS_APPEAR),
-                1,
-              ],
-            },
-            y: {
-              type: 'tween',
-              delay: CURSORS_APPEAR,
-              duration: NATASHA_LEAVE_START + NATASHA_LEAVE_DURATION - CURSORS_APPEAR,
-              ease: 'easeInOut',
-              times: [
-                0,
-                (CARD_PICKUP_ARRIVE - CURSORS_APPEAR) / (NATASHA_LEAVE_START + NATASHA_LEAVE_DURATION - CURSORS_APPEAR),
-                (NATASHA_LEAVE_START - CURSORS_APPEAR) / (NATASHA_LEAVE_START + NATASHA_LEAVE_DURATION - CURSORS_APPEAR),
-                1,
-              ],
-            },
-          }}
-        >
-          <div
-            className={'absolute'}
-            style={{ left: `${NATASHA.dest.left}%`, top: `${NATASHA.dest.top}%` }}
-          >
-            <Cursor
-              label={'Natasha'}
-              color={'#8427E0'}
-              direction={'left-top'}
-            />
-          </div>
-        </motion.div>
-
-        {/* Mathieu: holds at his spawn point next to the small card until
-            Natasha has hovered the big card for a beat, hops onto the small
-            card and holds through its hover window, then steps back to his
-            spawn point in sync with the card settling. */}
+            transform-only. Mathieu holds at his spawn point next to the small
+            card, hops onto its bottom-right corner, stays put for the hover
+            window, then retraces his steps in sync with the card settling. */}
         <motion.div
           className={'absolute inset-0'}
           initial={{
@@ -305,32 +221,8 @@ function ProjectTrackingIllu({ className }: IllustrationProps) {
           }}
           transition={{
             opacity: { delay: CURSORS_APPEAR, duration: 0.4, ease: 'easeOut' },
-            x: {
-              type: 'tween',
-              delay: CURSORS_APPEAR,
-              duration: MATHIEU_LEAVE_END - CURSORS_APPEAR,
-              ease: 'easeInOut',
-              times: [
-                0,
-                (MATHIEU_TRAVEL_START - CURSORS_APPEAR) / (MATHIEU_LEAVE_END - CURSORS_APPEAR),
-                (MATHIEU_ARRIVE - CURSORS_APPEAR) / (MATHIEU_LEAVE_END - CURSORS_APPEAR),
-                (MATHIEU_LEAVE_START - CURSORS_APPEAR) / (MATHIEU_LEAVE_END - CURSORS_APPEAR),
-                1,
-              ],
-            },
-            y: {
-              type: 'tween',
-              delay: CURSORS_APPEAR,
-              duration: MATHIEU_LEAVE_END - CURSORS_APPEAR,
-              ease: 'easeInOut',
-              times: [
-                0,
-                (MATHIEU_TRAVEL_START - CURSORS_APPEAR) / (MATHIEU_LEAVE_END - CURSORS_APPEAR),
-                (MATHIEU_ARRIVE - CURSORS_APPEAR) / (MATHIEU_LEAVE_END - CURSORS_APPEAR),
-                (MATHIEU_LEAVE_START - CURSORS_APPEAR) / (MATHIEU_LEAVE_END - CURSORS_APPEAR),
-                1,
-              ],
-            },
+            x: { type: 'tween', ease: 'easeInOut', ...MATHIEU_TIMING },
+            y: { type: 'tween', ease: 'easeInOut', ...MATHIEU_TIMING },
           }}
         >
           <div
@@ -345,65 +237,48 @@ function ProjectTrackingIllu({ className }: IllustrationProps) {
           </div>
         </motion.div>
 
-        {/* You: arrives alongside Natasha and Mathieu, lands near a card in
-            the Completed column right as Natasha reaches the big card, then
-            wanders inward toward the board's center in a few small,
-            unevenly-timed hops before settling — nothing to pick up, just a
-            third presence idly drifting. */}
+        {/* Olivia: same trip on the other side of the board, started 1.5s
+            after Mathieu's so the two picks read as a sequence. She lands on
+            the big card's bottom-right corner, holds there, then travels back
+            to her spawn point as the card settles. */}
         <motion.div
           className={'absolute inset-0'}
           initial={{
             opacity: 0,
-            x: `${YOU.spawn.left - YOU.dest.left}%`,
-            y: `${YOU.spawn.top - YOU.dest.top}%`,
+            x: `${OLIVIA.spawn.left - OLIVIA.dest.left}%`,
+            y: `${OLIVIA.spawn.top - OLIVIA.dest.top}%`,
           }}
           animate={{
             opacity: 1,
             x: [
-              `${YOU.spawn.left - YOU.dest.left}%`,
+              `${OLIVIA.spawn.left - OLIVIA.dest.left}%`,
+              `${OLIVIA.spawn.left - OLIVIA.dest.left}%`,
               '0%',
-              ...YOU_WANDER.map((point) => `${point.left - YOU.dest.left}%`),
+              '0%',
+              `${OLIVIA.spawn.left - OLIVIA.dest.left}%`,
             ],
             y: [
-              `${YOU.spawn.top - YOU.dest.top}%`,
+              `${OLIVIA.spawn.top - OLIVIA.dest.top}%`,
+              `${OLIVIA.spawn.top - OLIVIA.dest.top}%`,
               '0%',
-              ...YOU_WANDER.map((point) => `${point.top - YOU.dest.top}%`),
+              '0%',
+              `${OLIVIA.spawn.top - OLIVIA.dest.top}%`,
             ],
           }}
           transition={{
             opacity: { delay: CURSORS_APPEAR, duration: 0.4, ease: 'easeOut' },
-            x: {
-              type: 'tween',
-              delay: CURSORS_APPEAR,
-              duration: YOU_WANDER_END - CURSORS_APPEAR,
-              ease: 'easeInOut',
-              times: [
-                0,
-                (CARD_PICKUP_ARRIVE - CURSORS_APPEAR) / (YOU_WANDER_END - CURSORS_APPEAR),
-                ...YOU_WANDER_TIMESTAMPS.map((t) => (t - CURSORS_APPEAR) / (YOU_WANDER_END - CURSORS_APPEAR)),
-              ],
-            },
-            y: {
-              type: 'tween',
-              delay: CURSORS_APPEAR,
-              duration: YOU_WANDER_END - CURSORS_APPEAR,
-              ease: 'easeInOut',
-              times: [
-                0,
-                (CARD_PICKUP_ARRIVE - CURSORS_APPEAR) / (YOU_WANDER_END - CURSORS_APPEAR),
-                ...YOU_WANDER_TIMESTAMPS.map((t) => (t - CURSORS_APPEAR) / (YOU_WANDER_END - CURSORS_APPEAR)),
-              ],
-            },
+            x: { type: 'tween', ease: 'easeInOut', ...OLIVIA_TIMING },
+            y: { type: 'tween', ease: 'easeInOut', ...OLIVIA_TIMING },
           }}
         >
           <div
             className={'absolute'}
-            style={{ left: `${YOU.dest.left}%`, top: `${YOU.dest.top}%` }}
+            style={{ left: `${OLIVIA.dest.left}%`, top: `${OLIVIA.dest.top}%` }}
           >
             <Cursor
-              label={'You'}
-              color={YOU_COLOR}
-              direction={'right-top'}
+              label={'Olivia'}
+              color={'#8427E0'}
+              direction={'left-top'}
             />
           </div>
         </motion.div>
