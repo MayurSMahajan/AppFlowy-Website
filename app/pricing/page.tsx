@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import React from 'react';
-import Script from 'next/script';
+import SeoData from '@/components/layout/seo-data';
+import { generateBreadcrumbSchema } from '@/lib/schema';
 import { PricingHeroContainer } from './components/pricing-hero-container';
 import { AiPowerSection } from './components/ai-power-section';
 import { QuestionsSection } from './components/questions-section';
@@ -63,8 +64,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
 // Generate structured data for pricing page
 function generatePricingSchema(siteUrl: string) {
-  return {
-    '@context': 'https://schema.org',
+  const webPageSchema = {
     '@type': 'WebPage',
     name: title,
     description,
@@ -116,8 +116,8 @@ function generatePricingSchema(siteUrl: string) {
         {
           '@type': 'Offer',
           name: 'Self-hosted Plans',
-          description: 'Enterprise-grade self-hosted solutions starting from $1/month',
-          priceRange: '$1-Custom',
+          description: 'Self-hosted plans from Free to Enterprise',
+          priceRange: '$0-Contact us',
           priceCurrency: 'USD',
         },
       ],
@@ -133,6 +133,11 @@ function generatePricingSchema(siteUrl: string) {
     datePublished: new Date().toISOString(),
     dateModified: new Date().toISOString(),
   };
+
+  return {
+    '@context': 'https://schema.org',
+    '@graph': [webPageSchema, generateBreadcrumbSchema([{ name: 'Pricing', path: '/pricing' }])],
+  };
 }
 
 function PricingPage() {
@@ -140,12 +145,10 @@ function PricingPage() {
 
   return (
     <>
-      <Script
+      <SeoData
         id="pricing-ld-json"
-        type="application/ld+json"
-      >
-        {JSON.stringify(pricingSchema)}
-      </Script>
+        data={pricingSchema}
+      />
       <PricingStateProvider>
         {/* Opaque so the global body gradient in globals.scss does not show through. */}
         <div className="pricing-page bg-white">

@@ -10,6 +10,9 @@ const site_url = process.env.NEXT_PUBLIC_SITE_BASE_URL;
 
 export async function generateMetadata(): Promise<Metadata> {
   return {
+    title: "What's New: Latest Releases and Updates | AppFlowy",
+    description:
+      'The latest AppFlowy releases, updates and fixes. Follow every version’s new features, improvements and bug fixes across desktop and mobile.',
     alternates: {
       canonical: `${site_url}/what-is-new`,
     },
@@ -21,8 +24,10 @@ async function Page() {
 
   return (
     <div className="what-is-new-page">
-      <div className="z-10 px-6 text-center text-style-h1 font-bold">{whatIsNewConfig.title}</div>
-      <div className={'subtitle'}>{whatIsNewConfig.subtitle}</div>
+      <div className="py-[80px] px-6 text-center max-sm:py-[60px] w-full">
+        <div className="z-10 text-center text-style-h1 font-bold">{whatIsNewConfig.title}</div>
+        <div className={'text-text-tertiary text-style-h5 font-normal mt-3'}>{whatIsNewConfig.subtitle}</div>
+      </div>
       <div className={'content'}>
         <Versions versions={versions.map(parseChangelog)} />
       </div>

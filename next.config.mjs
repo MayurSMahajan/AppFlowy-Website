@@ -114,29 +114,23 @@ const nextConfig = {
     minimumCacheTTL: 60 * 60 * 24 * 7,
     unoptimized: true,
   },
-  async headers () {
+  async headers() {
     return [
       {
         // Apply these headers to all routes in your application.
         source: '/(.*)',
         headers: securityHeaders,
       },
-      // Cache Next.js static chunks with hashed filenames (immutable). Only
-      // in production: dev chunk filenames aren't content-hashed, so this
-      // header would make the browser pin stale JS across edits/restarts.
-      ...(isProd
-        ? [
-            {
-              source: '/_next/static/:path*',
-              headers: [
-                {
-                  key: 'Cache-Control',
-                  value: 'public, max-age=31536000, immutable',
-                },
-              ],
-            },
-          ]
-        : []),
+      {
+        // Development chunk URLs are reused after edits; only production chunks are immutable.
+        source: '/_next/static/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: isProd ? 'public, max-age=31536000, immutable' : 'no-store, must-revalidate',
+          },
+        ],
+      },
       {
         // Cache SVG sprite sheet for 1 year (immutable)
         source: '/images/company-logos-sprite.svg',
