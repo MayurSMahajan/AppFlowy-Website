@@ -317,7 +317,7 @@ function Page() {
                 items={['Open-core', 'Self-hosted', 'Local & on-prem AI', 'Cross-platform', 'Data control',]}
               />
             </div>
-            <ImportLink importBaseURL={importBaseURL} />
+            <ImportLink importBaseURL={importBaseURL} source='notion' />
           </div>
         </div>
         <div className={'af-container'}>
