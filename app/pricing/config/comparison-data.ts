@@ -41,19 +41,6 @@ export const comparisonPlans: ComparisonPlan[] = [
     }
   },
   {
-    id: 'seed',
-    name: 'Seed',
-    price: {
-      amount: '$1',
-      period: 'month'
-    },
-    billingInfo: 'billed annually',
-    cta: {
-      text: 'Upgrade',
-      variant: 'upgrade'
-    }
-  },
-  {
     id: 'one',
     name: 'One',
     price: {
@@ -83,7 +70,7 @@ export const comparisonPlans: ComparisonPlan[] = [
     id: 'enterprise',
     name: 'Enterprise',
     price: {
-      amount: 'Custom',
+      amount: 'Contact us',
       period: ''
     },
     cta: {
@@ -105,7 +92,6 @@ export const comparisonFeatureGroups: ComparisonFeatureGroup[] = [
         tooltip: 'The AppFlowy web app, right in your browser',
         support: {
           free: true,
-          seed: true,
           one: true,
           team: true,
           enterprise: true
@@ -117,7 +103,6 @@ export const comparisonFeatureGroups: ComparisonFeatureGroup[] = [
         tooltip: 'For self‑hosters to manage their AppFlowy instance',
         support: {
           free: true,
-          seed: true,
           one: true,
           team: true,
           enterprise: true
@@ -129,10 +114,19 @@ export const comparisonFeatureGroups: ComparisonFeatureGroup[] = [
         tooltip: 'Number of user seats per instance, unlimited workspaces',
         support: {
           free: '1',
-          seed: '1',
           one: '1',
-          team: 'Up to 1000',
+          team: 'Up to 1,000',
           enterprise: 'Unlimited'
+        }
+      },
+      {
+        id: 'version-history',
+        name: 'Version history',
+        support: {
+          free: true,
+          one: true,
+          team: true,
+          enterprise: true
         }
       },
       {
@@ -141,7 +135,6 @@ export const comparisonFeatureGroups: ComparisonFeatureGroup[] = [
         tooltip: 'Highly rated native desktop and mobile apps',
         support: {
           free: false,
-          seed: true,
           one: true,
           team: true,
           enterprise: true
@@ -159,7 +152,6 @@ export const comparisonFeatureGroups: ComparisonFeatureGroup[] = [
         tooltip: 'Run local AI right inside AppFlowy',
         support: {
           free: false,
-          seed: true,
           one: true,
           team: true,
           enterprise: true
@@ -171,7 +163,6 @@ export const comparisonFeatureGroups: ComparisonFeatureGroup[] = [
         tooltip: 'Self-hosted cloud AI, seamlessly integrated to power AppFlowy\'s AI features',
         support: {
           free: false,
-          seed: false,
           one: true,
           team: true,
           enterprise: true
@@ -189,7 +180,6 @@ export const comparisonFeatureGroups: ComparisonFeatureGroup[] = [
         tooltip: 'Publish pages to web; Create a website with AppFlowy',
         support: {
           free: true,
-          seed: true,
           one: true,
           team: true,
           enterprise: true
@@ -201,10 +191,20 @@ export const comparisonFeatureGroups: ComparisonFeatureGroup[] = [
         tooltip: 'Guests get page access instead of full workspace access',
         support: {
           free: 'Up to 3',
-          seed: 'Up to 3',
           one: 'Up to 10',
-          team: 'Up to 1000',
+          team: 'Up to 1,000',
           enterprise: 'Unlimited'
+        }
+      },
+      {
+        id: 'guest-invite-requests',
+        name: 'Guest invite requests',
+        tooltip: 'Require admin approval before the guest invite email is sent',
+        support: {
+          free: true,
+          one: true,
+          team: true,
+          enterprise: true
         }
       },
       {
@@ -213,7 +213,6 @@ export const comparisonFeatureGroups: ComparisonFeatureGroup[] = [
         tooltip: 'Real-time multi-user collaboration in the same workspace, with member management and granular permissions',
         support: {
           free: false,
-          seed: false,
           one: false,
           team: true,
           enterprise: true
@@ -231,7 +230,6 @@ export const comparisonFeatureGroups: ComparisonFeatureGroup[] = [
         tooltip: 'Private and offline with local RAG search and AI integrations',
         support: {
           free: false,
-          seed: false,
           one: true,
           team: true,
           enterprise: true
@@ -241,8 +239,27 @@ export const comparisonFeatureGroups: ComparisonFeatureGroup[] = [
         id: 'sso-saml',
         name: 'SSO incl. SAML 2.0',
         support: {
+          free: true,
+          one: true,
+          team: true,
+          enterprise: true
+        }
+      },
+      {
+        id: 'scim-provisioning',
+        name: 'SCIM provisioning',
+        support: {
           free: false,
-          seed: false,
+          one: false,
+          team: true,
+          enterprise: true
+        }
+      },
+      {
+        id: 'ldap-integration',
+        name: 'LDAP integration',
+        support: {
+          free: false,
           one: false,
           team: true,
           enterprise: true
@@ -253,9 +270,8 @@ export const comparisonFeatureGroups: ComparisonFeatureGroup[] = [
         name: 'Security audit log',
         support: {
           free: false,
-          seed: false,
           one: false,
-          team: false,
+          team: true,
           enterprise: true
         }
       }
@@ -271,7 +287,17 @@ export const comparisonFeatureGroups: ComparisonFeatureGroup[] = [
         tooltip: 'Dedicated support from AppFlowy Team',
         support: {
           free: false,
-          seed: false,
+          one: false,
+          team: true,
+          enterprise: true
+        }
+      },
+      {
+        id: 'custom-migration',
+        name: 'Custom migration',
+        tooltip: 'High-touch Notion and Confluence migration assistance',
+        support: {
+          free: false,
           one: false,
           team: true,
           enterprise: true
@@ -283,7 +309,6 @@ export const comparisonFeatureGroups: ComparisonFeatureGroup[] = [
         tooltip: 'Deploy AppFlowy on your infra by AppFlowy Team',
         support: {
           free: false,
-          seed: false,
           one: false,
           team: false,
           enterprise: true
@@ -295,7 +320,6 @@ export const comparisonFeatureGroups: ComparisonFeatureGroup[] = [
         tooltip: 'Get a white-label version of AppFlowy with your own branding',
         support: {
           free: false,
-          seed: false,
           one: false,
           team: false,
           enterprise: true
@@ -307,7 +331,6 @@ export const comparisonFeatureGroups: ComparisonFeatureGroup[] = [
         tooltip: 'AppFlowy-built bespoke customizations for your organization',
         support: {
           free: false,
-          seed: false,
           one: false,
           team: false,
           enterprise: true

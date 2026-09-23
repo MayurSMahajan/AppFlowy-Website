@@ -52,10 +52,9 @@ const cloudPlans = [
 
 const selfHostedPlans = [
   'Free',
-  'Seed ($1/month)',
   'One ($6/month)',
   'Team ($10/seat/month)',
-  'Enterprise (Custom)',
+  'Enterprise (Contact us)',
   'Not using AppFlowy yet'
 ];
 
