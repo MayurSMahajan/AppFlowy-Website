@@ -180,10 +180,6 @@ export const aboutPageConfig = {
         logo: '/images/amazon.svg',
       },
       {
-        name: 'amd',
-        logo: '/images/amd.svg',
-      },
-      {
         name: 'atlassian',
         logo: '/images/atlassian.svg',
       },
