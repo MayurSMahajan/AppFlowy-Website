@@ -10,12 +10,23 @@ function DownloadOsBtn() {
   const { downloadOS } = useDownload();
   const { os, isLinux } = useClient();
 
+  // OSes we ship a build for; anything else (or an undetected OS) is sent to the full platform list.
+  const hasOsDownload = useMemo(() => {
+    const osName = os?.name?.toLowerCase().replaceAll(' ', '');
+
+    return ['macos', 'windows', 'linux', 'ios', 'android'].includes(osName ?? '');
+  }, [os]);
+
   const name = useMemo(() => {
     if (!os) return '';
     if (os.name === 'Mac OS') return 'macOS';
     if (os.name === 'Linux') return 'Linux';
     return os.name;
   }, [os]);
+
+  const scrollToAllPlatforms = () => {
+    document.getElementById('across')?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  };
 
   return (
     <div className={'flex flex-col items-center justify-center gap-10 text-center'}>
@@ -27,18 +38,18 @@ function DownloadOsBtn() {
         {isLinux ? (
           <LinuxBtnGroup title={'Download'} />
         ) : (
-          <Button onClick={downloadOS} size={'xl'}
+          <Button onClick={hasOsDownload ? downloadOS : scrollToAllPlatforms} size={'xl'}
             className={'min-w-[180px] rounded-lg bg-night-blue text-white transition-colors text-base leading-[150%] hover:bg-night-blue/90 max-sm:w-full'}>
-            {'Download ' + name + ' app'}
+            {hasOsDownload ? `Download ${name} app` : 'Download AppFlowy'}
           </Button>
         )}
         <a
           href="#across"
           onClick={(e) => {
             e.preventDefault();
-            document.getElementById('across')?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            scrollToAllPlatforms();
           }}
-          className='text-base text-text-tertiary hover:text-text-primary transition-colors duration-280 flex items-center justify-center gap-2'>
+          className='text-base text-text-tertiary hover:text-text-primary transition-colors duration-[280ms] flex items-center justify-center gap-2'>
           View all platforms
         </a>
       </div>

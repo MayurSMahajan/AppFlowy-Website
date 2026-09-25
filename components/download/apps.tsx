@@ -1,9 +1,10 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { downloadMacIntel, downloadMacUniversal, downloadWindows, useDownload } from '@/lib/hooks/use-download';
 import LinuxBtnGroup from '@/components/shared/linux-btn-group';
 import { Button } from '@/components/ui/button';
+import { collectEvent, EventName } from '@/lib/collect';
 
 const filledBtnClassName = 'w-full justify-start rounded-lg bg-night-blue text-white transition-colors hover:bg-night-blue/90';
 
@@ -54,6 +55,15 @@ function AndroidIcon() {
 function DownloadApps() {
   const { downloadIOS, downloadAndroid } = useDownload();
 
+  useEffect(() => {
+    collectEvent(EventName.downloadAppleBtn, {
+      type: 'view',
+    });
+    collectEvent(EventName.downloadAndroidBtn, {
+      type: 'view',
+    });
+  }, []);
+
   const desktopApps = [
     {
       title: 'macOS',
@@ -74,7 +84,7 @@ function DownloadApps() {
       icon: <WindowsIcon />,
       btns: (
         <Button size={'xl'} className={filledBtnClassName} onClick={() => downloadWindows(true)}>
-          Download for Universal
+          Download for Windows
         </Button>
       ),
     },
@@ -113,8 +123,8 @@ function DownloadApps() {
         <div className={'apps-bg-circle apps-bg-circle-2'} />
         <div className={'apps-bg-circle apps-bg-circle-3'} />
       </div>
-      <div className={'relative w-full max-w-[1280px] py-[120px] px-6 max-md:py-[80px] max-md:px-4 '}>
-        <div className="flex flex-col gap-3 mb-20">
+      <div className={'relative w-full max-w-[1280px] py-[120px] px-6 max-md:py-[80px] max-md:px-4'}>
+        <div className={'mb-20 flex flex-col gap-3'}>
           <h2 className={'text-center text-style-h1 font-bold'}>Get AppFlowy at your desk or on the go</h2>
           <p className={'text-base leading-[150%] text-text-secondary text-center'}>Fast and minimal. Work without distractions.</p>
         </div>
@@ -122,7 +132,8 @@ function DownloadApps() {
           <div className={'apps-col'}>
             <div className={'apps-col-title'}>Desktop apps</div>
             {desktopApps.map((item) => (
-              <div key={item.title} className={'apps-row'}>
+              // The id is the anchor for the footer/nav links, e.g. /download#macOS.
+              <div key={item.title} id={item.title} className={'apps-row'}>
                 <div className={'apps-row-label'}>
                   {item.icon}
                   {item.title}

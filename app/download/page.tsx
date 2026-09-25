@@ -21,7 +21,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
 function Page() {
   return (
-    <div className={'download-page overflow-hidden'}>
+    <div className={'download-page'}>
       <DownloadOS />
       <div className={'w-full bg-white pb-16 pt-24 max-md:py-5 max-md:pt-[60px]'}>
         <ScrollIcons />

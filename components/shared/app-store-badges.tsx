@@ -1,8 +1,9 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useDownload } from '@/lib/hooks/use-download';
 import { cn } from '@/lib/utils';
+import { collectEvent, EventName } from '@/lib/collect';
 
 const badgeClassName =
   'flex h-10 items-center gap-2 rounded-[8px] border border-[#a6a6a6] bg-black px-3 text-white transition-opacity hover:opacity-85';
@@ -31,6 +32,15 @@ function GooglePlayLogo() {
 
 function AppStoreBadges({ className }: { className?: string }) {
   const { downloadIOS, downloadAndroid } = useDownload();
+
+  useEffect(() => {
+    collectEvent(EventName.downloadAppleBtn, {
+      type: 'view',
+    });
+    collectEvent(EventName.downloadAndroidBtn, {
+      type: 'view',
+    });
+  }, []);
 
   return (
     <div className={cn('flex flex-wrap items-center gap-2', className)}>
