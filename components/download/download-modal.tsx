@@ -2,88 +2,17 @@
 
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import * as Dialog from '@radix-ui/react-dialog';
-import Image, { StaticImageData } from 'next/image';
+import Image from 'next/image';
 import { useClient } from '@/lib/hooks/use-client';
 import { DOWNLOAD_MODAL_EVENT, download } from '@/lib/download';
 import { Storage } from '@/lib/storage';
-import step1Img from '@/assets/images/download/download-step-1.webp';
-import step2Img from '@/assets/images/download/download-step-2.webp';
-import step3Img from '@/assets/images/download/download-step-3.webp';
-
-type OS = 'macos' | 'windows' | 'linux';
-
-interface Step {
-  title: string;
-  description: React.ReactNode;
-  image?: StaticImageData;
-}
-
-function getOsFromName(name?: string): OS {
-  if (name?.includes('windows')) return 'windows';
-  if (name?.includes('linux')) return 'linux';
-  return 'macos';
-}
-
-function getSteps(os: OS, onManualDownload: () => void): Step[] {
-  const manualDownloadLink = (
-    <>
-      {`Your download will begin automatically`}
-      <br />
-      {`If it doesn't, you can `}
-      <span onClick={onManualDownload} className={'highlight cursor-pointer text-primary underline'}>
-        download AppFlowy manually.
-      </span>
-    </>
-  );
-
-  switch (os) {
-    case 'windows':
-      return [
-        { title: '1. Download', description: manualDownloadLink },
-        {
-          title: '2. Open file',
-          description: `Once it's downloaded, open the installer (.exe) file from your downloads folder.`,
-        },
-        {
-          title: '3. Install & Launch',
-          description: `Follow the setup wizard to install AppFlowy, then launch it from your Start menu.`,
-        },
-      ];
-    case 'linux':
-      return [
-        { title: '1. Download', description: manualDownloadLink },
-        {
-          title: '2. Open file',
-          description: `Once downloaded, install the package (AppImage, .deb, or .rpm) using your preferred method.`,
-        },
-        {
-          title: '3. Install & Launch',
-          description: `Follow your distribution's instructions to install AppFlowy, then launch it from your applications menu.`,
-        },
-      ];
-    case 'macos':
-    default:
-      return [
-        { title: '1. Download', description: manualDownloadLink, image: step1Img },
-        {
-          title: '2. Open file',
-          description: `Once its downloaded, open the file by double-clicking it in your downloads folder.`,
-          image: step2Img,
-        },
-        {
-          title: '3. Install & Launch',
-          description: `Follow the instructions to install AppFlowy to your computer.`,
-          image: step3Img,
-        },
-      ];
-  }
-}
+import { getDownloadSteps, getOsFromName } from '@/components/download/download-steps';
 
 function DownloadModal() {
   const [open, setOpen] = useState(false);
   const { os } = useClient();
 
-  const currentOS = useMemo(() => getOsFromName(os?.name?.toLowerCase().replaceAll(' ', '')), [os]);
+  const currentOS = useMemo(() => getOsFromName(os?.name), [os]);
 
   useEffect(() => {
     const handleOpen = () => setOpen(true);
@@ -99,7 +28,7 @@ function DownloadModal() {
     download(url, false);
   }, []);
 
-  const steps = useMemo(() => getSteps(currentOS, handleManualDownload), [currentOS, handleManualDownload]);
+  const steps = useMemo(() => getDownloadSteps(currentOS), [currentOS]);
 
   return (
     <Dialog.Root open={open} onOpenChange={setOpen}>
