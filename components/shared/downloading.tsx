@@ -39,7 +39,7 @@ function Downloading() {
 
   return (
     <>
-      <section className={'flex w-full justify-center px-6 pt-[180px] max-sm:px-4 max-sm:pt-[140px]'}>
+      <section className={'flex w-full justify-center px-8 pt-[180px] max-sm:px-4 max-sm:pt-[140px]'}>
         <div className={'flex w-full max-w-[1280px] flex-col items-center'}>
           <h1 className={'text-style-h1 text-center font-bold tracking-[-0.04em] text-text-primary'}>
             Thanks for downloading
@@ -77,7 +77,7 @@ function Downloading() {
           </ol>
         </div>
       </section>
-      <MobileAppBanner className={'bg-transparent py-[120px] max-sm:py-[60px]'} />
+      <MobileAppBanner className={'bg-transparent pt-[200px] pb-[160px] max-sm:py-[80px]'} />
     </>
   );
 }

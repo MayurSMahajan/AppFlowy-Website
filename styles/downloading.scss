@@ -1,5 +1,11 @@
 .download-progress-page {
-  @apply relative isolate flex w-full flex-col items-center overflow-hidden;
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  align-items: center;
+  overflow: hidden;
   background: white;
   color: #1f2329;
   // Keeps the large blurred blobs on their own compositing layer (Safari repaints otherwise).
