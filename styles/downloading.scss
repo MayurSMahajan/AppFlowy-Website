@@ -1,6 +1,51 @@
-
 .download-progress-page {
-  @apply flex flex-col items-center w-full;
-  background: linear-gradient(180deg, #F8FAFF 0%, #F8FAFF 59.16%, #E4DDFF 100%);
-  color: #1F2329;
+  @apply relative isolate flex w-full flex-col items-center overflow-hidden;
+  background: white;
+  color: #1f2329;
+  // Keeps the large blurred blobs on their own compositing layer (Safari repaints otherwise).
+  transform: translate3d(0, 0, 0);
+
+  .page-blob {
+    position: absolute;
+    z-index: -1;
+    width: 800px;
+    height: 800px;
+    border-radius: 50%;
+    pointer-events: none;
+
+    @media (max-width: 639px) {
+      width: 300px;
+      height: 300px;
+    }
+  }
+
+  // Centred on the left edge, so half of it is cut off.
+  .page-blob-left {
+    left: -400px;
+    top: 10%;
+    background: #d0c4ff80;
+    filter: blur(600px);
+
+    // On phones, only a sliver of the circle stays on screen, so the blur reads as a tall glow along the edge.
+    @media (max-width: 639px) {
+      left: -220px;
+      top: 0;
+      // A 600px blur would wash a 300px blob out completely, so phones get a softer blur.
+      filter: blur(80px);
+    }
+  }
+
+  // Centred on the right edge around the middle of the page, so half of it is cut off.
+  .page-blob-right {
+    right: -400px;
+    top: 25%;
+    background: #9cbdff80;
+    filter: blur(300px);
+
+    @media (max-width: 639px) {
+      right: -220px;
+      top: 55%;
+      filter: blur(80px);
+    }
+  }
 }

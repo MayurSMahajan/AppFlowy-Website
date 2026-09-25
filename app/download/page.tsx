@@ -6,7 +6,6 @@ import DownloadOS from '@/components/download/os';
 import DownloadApps from '@/components/download/apps';
 import LightTestimonial from '@/components/download/light-testimonial';
 import ModalDownload from '@/components/download/modal-download';
-import DownloadModal from '@/components/download/download-modal';
 import ScrollIcons from '@/components/shared/scroll-icons';
 import GetStart from '@/components/product/get-start';
 
@@ -31,7 +30,6 @@ function Page() {
       <LightTestimonial />
       <GetStart />
       <ModalDownload />
-      <DownloadModal />
     </div>
   );
 }

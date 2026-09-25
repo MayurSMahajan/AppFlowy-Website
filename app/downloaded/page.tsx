@@ -14,7 +14,13 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 function Page() {
-  return <div className={'download-progress-page'}>{<Downloading />}</div>;
+  return (
+    <div className={'download-progress-page'}>
+      <div className={'page-blob page-blob-left'} />
+      <div className={'page-blob page-blob-right'} />
+      <Downloading />
+    </div>
+  );
 }
 
 export default Page;
